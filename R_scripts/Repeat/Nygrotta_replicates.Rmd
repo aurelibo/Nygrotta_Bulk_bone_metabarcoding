@@ -1,0 +1,85 @@
+
+
+```{r}
+---
+#Article title: "R Markdown for the article : Ancient DNA and osteological analyses of a unique sub-fossil bone assemblage reveal Early Holocene faunal expansion into the Scandinavian Arctic"
+#Section: "Building presence/absence matrix for PCR and subsamples test"
+#Author of this script: "Aurélie Boilard"
+#Institutional email : "aurelibo@uio.no"
+#Personal email : "aurelie.boilard.1@outlook.com"
+#Updated : "August 2023"
+---
+
+
+```{r}
+
+#Activate the following R packages
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+
+##Load your data and metadata
+metadata <- Metadata_NYMamp007
+#Use cleaned tables to run the analysis on.
+#Load NYMamp007_clean_AUGUST2023
+
+#----------------------------------------------------------------------------------------------------------------------
+#PCR REPLICATE PRESENCE/ABSENCE TABLE
+#----------------------------------------------------------------------------------------------------------------------
+
+#PCR repeat table
+#Store the list of PCR replicate information of the metadata into an object.
+pcr_rep  <- metadata$PCR_id
+#Load your data into the reads_pcr object.
+reads_pcr <- NYMamp007_clean_AUGUST2023
+#Replace Group.1 with the sample information for this test.
+reads_pcr$Group.1 <- pcr_rep
+#Add the information of the PCR repeat number to the table.
+reads_pcr$PCR_repeat <- metadata$PCR_repeat 
+#It's not needed, technically, but in the next line, a column to disappears. It's basically a dummy.
+pres_abs_pcr <- data.frame (ifelse(reads_pcr [,-(ncol(reads_pcr))]>0, 1, 0))
+#
+pres_abs_pcr$Group.1 <- pcr_rep
+#Make sure you still have all the info you need.
+#Save the presence/absence matrix as a csv.
+
+write_csv(pres_abs_pcr, "YOUR_PATH/PCRrepeatsNYMampAUGUST2023.csv")
+
+#----------------------------------------------------------------------------------------------------------------------
+#BIOLOGICAL REPLICATE PRESENCE/ABSENCE TABLE
+#----------------------------------------------------------------------------------------------------------------------
+
+
+#Store the sample names for this test in an object.
+bio_rep  <- metadata$Bio_rep
+#Load your data
+reads_biorep <- NYMamp007_clean_AUGUST2023
+#Change the sample name
+reads_biorep$Bio_rep <- bio_rep
+#Get the PCR repeat information
+reads_biorep$PCR <- metadata$PCR_repeat
+
+
+
+#Select only samples of PCR repeat 1
+reads_biorep_pcr1 <- subset(reads_biorep, PCR == 1)
+#Store the sample names
+bio_rep3 <-reads_biorep_pcr1$Group.1
+
+#Now transform the reads count into a absence/presence matrix
+pres_abs_BIO <- data.frame (ifelse(reads_biorep_pcr1 [,-(ncol(reads_biorep_pcr1))]>0, 1, 0))
+#Get back the sample names
+pres_abs_BIO$Group.1 <- bio_rep3
+
+#Transpose in Excel and remove samples without pcr repeats.
+write_csv(pres_abs, "YOUR_PATH/BIOrepeatsPCR1NYMamp007_AUGUST2023.csv")
+
+
+
+
+```
+
+
+```
+
